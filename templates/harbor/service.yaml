@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "harbor.fullname" . }}
+  labels:
+    {{- include "harbor.labels" . | nindent 4 }}
+  {{- with .Values.harbor.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.harbor.service.type }}
+  {{- if .Values.harbor.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.harbor.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.harbor.service.port }}
+      targetPort: {{ .Values.harbor.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "harbor.selectorLabels" . | nindent 4 }}
