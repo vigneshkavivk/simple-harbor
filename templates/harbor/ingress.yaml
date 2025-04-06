@@ -1,0 +1,41 @@
+{{- if .Values.harbor.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "harbor.fullname" . }}
+  labels:
+    {{- include "harbor.labels" . | nindent 4 }}
+  {{- with .Values.harbor.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.harbor.ingress.className }}
+  ingressClassName: {{ .Values.harbor.ingress.className }}
+  {{- end }}
+  rules:
+  {{- range .Values.harbor.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "harbor.fullname" $ }}
+                port:
+                  number: {{ $.Values.harbor.service.port }}
+        {{- end }}
+  {{- end }}
+  {{- if .Values.harbor.ingress.tls }}
+  tls:
+    {{- range .Values.harbor.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+{{- end }}
