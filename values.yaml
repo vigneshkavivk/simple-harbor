@@ -1,0 +1,50 @@
+# Global Harbor configuration
+image:
+  repository: goharbor/harbor-core
+  tag: v2.7.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8080
+  annotations: {}
+  loadBalancerIP: ""
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: harbor.example.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+postgresql:
+  enabled: true
+  postgresqlUsername: "harbor"
+  postgresqlPassword: "change-me"
+  postgresqlDatabase: "registry"
+  persistence:
+    enabled: true
+    size: 8Gi
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+
+harbor:
+  adminPassword: "Harbor12345"
+  secretKey: "not-a-secure-key"
+  externalURL: "http://harbor.example.com"
+  database:
+    type: "postgresql"
