@@ -1,0 +1,17 @@
+{{- if .Values.harbor.persistence.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "harbor.fullname" . }}-pvc
+  labels:
+    {{- include "harbor.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.harbor.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.harbor.persistence.size }}
+  {{- if .Values.harbor.persistence.storageClass }}
+  storageClassName: {{ .Values.harbor.persistence.storageClass }}
+  {{- end }}
+{{- end }}
