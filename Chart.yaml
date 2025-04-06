@@ -3,12 +3,3 @@ name: harbor
 description: A Helm chart for deploying Harbor container registry
 version: 1.0.0
 appVersion: 2.7.0
-dependencies:
-  - name: postgresql
-    version: 11.6.12
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
-  - name: redis
-    version: 16.8.5
-    repository: https://charts.bitnami.com/bitnami
-    condition: redis.enabled
