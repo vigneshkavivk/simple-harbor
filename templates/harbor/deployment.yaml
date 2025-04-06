@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "harbor.fullname" . }}
+  labels:
+    {{- include "harbor.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "harbor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "harbor.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: harbor-core
+          image: "{{ .Values.harbor.image.repository }}:{{ .Values.harbor.image.tag }}"
+          imagePullPolicy: {{ .Values.harbor.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.harbor.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: POSTGRESQL_HOST
+              value: {{ include "harbor.postgresql.fullname" . }}
+            - name: POSTGRESQL_PORT
+              value: "{{ .Values.postgresql.service.port }}"
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "harbor.postgresql.fullname" . }}-secret
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "harbor.postgresql.fullname" . }}-secret
+                  key: password
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "harbor.postgresql.fullname" . }}-secret
+                  key: database
+            - name: REDIS_HOST
+              value: {{ include "harbor.redis.fullname" . }}
+            - name: REDIS_PORT
+              value: "{{ .Values.redis.service.port }}"
+            - name: HARBOR_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "harbor.fullname" . }}-secret
+                  key: admin-password
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "harbor.fullname" . }}-secret
+                  key: secret-key
+            - name: EXTERNAL_URL
+              value: {{ .Values.harbor.externalURL }}
+          volumeMounts:
+            - name: storage
+              mountPath: /storage
+      volumes:
+        - name: storage
+          {{- if .Values.harbor.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "harbor.fullname" . }}-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
