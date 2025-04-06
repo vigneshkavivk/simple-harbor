@@ -1,6 +1,6 @@
-# Harbor Helm Chart
+# Harbor Helm Chart (Standalone)
 
-This Helm chart deploys Harbor container registry with a LoadBalancer service.
+This Helm chart deploys Harbor container registry with standalone PostgreSQL and Redis components.
 
 ## Prerequisites
 
