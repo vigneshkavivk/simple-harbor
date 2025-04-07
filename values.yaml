@@ -1,6 +1,6 @@
 # Global configuration
 global:
-  namespace: sim-harbor
+  namespace: harbor
 
 # Harbor configuration
 harbor:
@@ -29,13 +29,14 @@ harbor:
 
   persistence:
     enabled: true
-    storageClass: ""
+    storageClass: harbor-storage
+    volumeName: harbor-simple-pv
     accessMode: ReadWriteOnce
     size: 10Gi
 
-  adminPassword: "Harbor12345"
-  secretKey: "not-a-secure-key"
-  externalURL: "http://harbor.example.com"
+  adminPassword: Harbor12345
+  secretKey: not-a-secure-key
+  externalURL: http://harbor.example.com
 
 # PostgreSQL configuration
 postgresql:
@@ -50,18 +51,22 @@ postgresql:
 
   persistence:
     enabled: true
-    storageClass: ""
+    storageClass: harbor-storage
+    volumeName: harbor-simple-database-pv
     accessMode: ReadWriteOnce
     size: 8Gi
 
   credentials:
-    username: "harbor"
-    password: "change-me"
-    database: "registry"
+    username: harbor
+    password: change-me
+    database: registry
 
 # Redis configuration
 redis:
   enabled: true
+  host: my-harbor-redis
+  port: 6379
+  password: admin123456  # Must match password in core env vars
   image:
     repository: redis
     tag: 6-alpine
@@ -71,7 +76,8 @@ redis:
     port: 6379
 
   persistence:
-    enabled: false
-    storageClass: ""
+    enabled: true
+    storageClass: harbor-storage
+    volumeName: harbor-simple-redis-pv
     accessMode: ReadWriteOnce
     size: 4Gi
